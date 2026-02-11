@@ -62,6 +62,7 @@
       border-radius: 6px;
       cursor: pointer;
       width: 100%;
+      transition: 0.3s;
     }
 
     .button:hover {
@@ -95,22 +96,26 @@
 
   </div>
 
-  <script>
 
-    function goHome() {
+ <script>
 
-      window.location.href = "/";
+function goHome() {
 
-    }
+  fetch("/clear")
+  .then(() => {
 
-    // Auto redirect after 3 seconds
-    setTimeout(function() {
+    window.location.href = "/";
 
-      window.location.href = "/";
+  });
 
-    }, 3000);
+}
 
-  </script>
+// auto redirect after 3 seconds
+setTimeout(goHome, 3000);
+
+</script>
+
+
 
 </body>
 

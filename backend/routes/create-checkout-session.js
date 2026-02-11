@@ -32,27 +32,35 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // IMPORTANT: use dynamic URLs from frontend
+    // VERY IMPORTANT: fallback URLs
+    const finalSuccessUrl =
+      successUrl || "http://localhost:5000/set-success";
+
+    const finalCancelUrl =
+      cancelUrl || "http://localhost:5000/set-cancel";
+
     const session = await stripe.checkout.sessions.create({
 
       payment_method_types: ["card"],
 
-      line_items: [{
-        price_data: {
-          currency: project.currency,
-          product_data: {
-            name: project.name
+      line_items: [
+        {
+          price_data: {
+            currency: project.currency,
+            product_data: {
+              name: project.name
+            },
+            unit_amount: amount * 100
           },
-          unit_amount: amount * 100
-        },
-        quantity: 1
-      }],
+          quantity: 1
+        }
+      ],
 
       mode: "payment",
 
-      success_url: successUrl,
+      success_url: finalSuccessUrl,
 
-      cancel_url: cancelUrl
+      cancel_url: finalCancelUrl
 
     });
 
@@ -63,7 +71,7 @@ router.post("/", async (req, res) => {
   }
   catch (error) {
 
-    console.error(error);
+    console.error("Stripe error:", error);
 
     res.status(500).json({
       error: "Payment failed"

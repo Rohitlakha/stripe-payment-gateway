@@ -133,17 +133,18 @@
 
         await StripeGateway.startPayment({
 
-  projectId: "flask_course",
+          projectId: "flask_course",
 
-  amount: 500,
+              amount: 500,
 
-  backendUrl: "http://localhost:4242",
+               backendUrl: "http://localhost:4242",
 
-  successUrl: window.location.origin + "/set-success?session_id={CHECKOUT_SESSION_ID}",
+              successUrl: "http://localhost:5000/set-success",
 
-  cancelUrl: window.location.origin + "/set-cancel?session_id={CHECKOUT_SESSION_ID}"
+                cancelUrl: "http://localhost:5000/set-cancel"
 
 });
+
 
 
       }
