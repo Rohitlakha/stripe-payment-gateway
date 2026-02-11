@@ -6,15 +6,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Secure Payment | Stripe Gateway</title>
+  <title>Secure Payment | Flask Course</title>
 
-  <!-- Stripe -->
+  <!-- Load Stripe ONCE -->
   <script src="https://js.stripe.com/v3/"></script>
 
-  <!-- Payment SDK -->
+  <!-- Load your SDK -->
   <script src="http://localhost:4242/sdk/payment-sdk.js"></script>
 
-  <!-- Professional CSS -->
   <style>
 
     body {
@@ -29,95 +28,56 @@
     }
 
     .payment-container {
-
       background: white;
-
       padding: 40px;
-
       border-radius: 12px;
-
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-
       text-align: center;
-
       width: 350px;
-
     }
 
     .payment-title {
-
       font-size: 24px;
-
       margin-bottom: 10px;
-
       color: #333;
-
     }
 
     .payment-description {
-
       color: #666;
-
-      margin-bottom: 25px;
-
+      margin-bottom: 20px;
     }
 
     .payment-amount {
-
       font-size: 28px;
-
       font-weight: bold;
-
-      color: #2ecc71;
-
+      color: #27ae60;
       margin-bottom: 25px;
-
     }
 
     .pay-button {
-
       background: #6772e5;
-
       color: white;
-
       border: none;
-
-      padding: 12px 25px;
-
+      padding: 12px;
       font-size: 16px;
-
       border-radius: 6px;
-
       cursor: pointer;
-
-      transition: 0.3s;
-
       width: 100%;
-
     }
 
     .pay-button:hover {
-
       background: #5469d4;
-
     }
 
     .pay-button:disabled {
-
       background: gray;
-
       cursor: not-allowed;
-
     }
 
     .status {
-
       margin-top: 15px;
-
       font-size: 14px;
-
       color: #555;
-
     }
 
   </style>
@@ -129,19 +89,19 @@
   <div class="payment-container">
 
     <div class="payment-title">
-      Secure Payment
+      Flask Course Payment
     </div>
 
     <div class="payment-description">
-      Flask Course Enrollment Fee
+      Secure payment powered by Stripe
     </div>
 
     <div class="payment-amount">
       ₹500
     </div>
 
-    <button id="payBtn" class="pay-button" onclick="pay()">
-      Pay Now
+    <button id="payBtn" class="pay-button">
+      Pay Securely
     </button>
 
     <div id="status" class="status"></div>
@@ -151,17 +111,24 @@
 
   <script>
 
-    async function pay() {
+    const button = document.getElementById("payBtn");
+    const status = document.getElementById("status");
 
-      const button = document.getElementById("payBtn");
+    button.addEventListener("click", startPayment);
 
-      const status = document.getElementById("status");
+    async function startPayment() {
 
       try {
 
+        // Check SDK
+        if (!window.StripeGateway) {
+          status.innerText = "Payment system not loaded. Refresh page.";
+          return;
+        }
+
         button.disabled = true;
 
-        status.innerText = "Initializing secure payment...";
+        status.innerText = "Connecting to secure payment...";
 
         await StripeGateway.startPayment({
 
@@ -169,12 +136,18 @@
 
           amount: 500,
 
-          backendUrl: "http://localhost:4242"
+          backendUrl: "http://localhost:4242",
+
+          successUrl: window.location.origin + "/success",
+
+          cancelUrl: window.location.origin + "/cancel"
 
         });
 
       }
       catch (error) {
+
+        console.error(error);
 
         status.innerText = "Payment failed. Try again.";
 
