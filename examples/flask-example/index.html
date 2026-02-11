@@ -1,42 +1,190 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
 
-  <title>Stripe Payment Test</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Load Stripe FIRST -->
+  <title>Secure Payment | Stripe Gateway</title>
+
+  <!-- Stripe -->
   <script src="https://js.stripe.com/v3/"></script>
 
-  <!-- Load SDK from backend server -->
+  <!-- Payment SDK -->
   <script src="http://localhost:4242/sdk/payment-sdk.js"></script>
+
+  <!-- Professional CSS -->
+  <style>
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .payment-container {
+
+      background: white;
+
+      padding: 40px;
+
+      border-radius: 12px;
+
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+      text-align: center;
+
+      width: 350px;
+
+    }
+
+    .payment-title {
+
+      font-size: 24px;
+
+      margin-bottom: 10px;
+
+      color: #333;
+
+    }
+
+    .payment-description {
+
+      color: #666;
+
+      margin-bottom: 25px;
+
+    }
+
+    .payment-amount {
+
+      font-size: 28px;
+
+      font-weight: bold;
+
+      color: #2ecc71;
+
+      margin-bottom: 25px;
+
+    }
+
+    .pay-button {
+
+      background: #6772e5;
+
+      color: white;
+
+      border: none;
+
+      padding: 12px 25px;
+
+      font-size: 16px;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      transition: 0.3s;
+
+      width: 100%;
+
+    }
+
+    .pay-button:hover {
+
+      background: #5469d4;
+
+    }
+
+    .pay-button:disabled {
+
+      background: gray;
+
+      cursor: not-allowed;
+
+    }
+
+    .status {
+
+      margin-top: 15px;
+
+      font-size: 14px;
+
+      color: #555;
+
+    }
+
+  </style>
 
 </head>
 
 <body>
 
-<h2>Stripe Payment Gateway Test</h2>
+  <div class="payment-container">
 
-<button onclick="payNow()">
-  Pay ₹500
-</button>
+    <div class="payment-title">
+      Secure Payment
+    </div>
 
-<script>
+    <div class="payment-description">
+      Flask Course Enrollment Fee
+    </div>
 
-function payNow() {
+    <div class="payment-amount">
+      ₹500
+    </div>
 
-  StripeGateway.startPayment({
+    <button id="payBtn" class="pay-button" onclick="pay()">
+      Pay Now
+    </button>
 
-    amount: 500,
+    <div id="status" class="status"></div>
 
-    productName: "Student Course Fee",
+  </div>
 
-    publishableKey: "pk_test_51SjE4FFG8Xappwmkw79RnLJs6A21dlxjS7kuO0IgCa1PlnxwQOz0djpldsDJbjI5wf7jmYiHHnmRPiQV1pko5IvQ00OJtcs8tc"
 
-  });
+  <script>
 
-}
+    async function pay() {
 
-</script>
+      const button = document.getElementById("payBtn");
+
+      const status = document.getElementById("status");
+
+      try {
+
+        button.disabled = true;
+
+        status.innerText = "Initializing secure payment...";
+
+        await StripeGateway.startPayment({
+
+          projectId: "flask_course",
+
+          amount: 500,
+
+          backendUrl: "http://localhost:4242"
+
+        });
+
+      }
+      catch (error) {
+
+        status.innerText = "Payment failed. Try again.";
+
+        button.disabled = false;
+
+      }
+
+    }
+
+  </script>
 
 </body>
 
