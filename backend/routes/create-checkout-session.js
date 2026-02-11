@@ -4,104 +4,57 @@ const Stripe = require("stripe");
 
 const projects = require("../config/projects");
 
-// Initialize Stripe securely
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-06-20"
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-
-/*
-========================================
-Create Checkout Session (Dynamic)
-========================================
-*/
 router.post("/", async (req, res) => {
 
   try {
 
     const { projectId, amount, successUrl, cancelUrl } = req.body;
 
-    /* ===============================
-       Basic validation
-    =============================== */
-
-    if (!projectId) {
+    if (!projectId || !amount) {
       return res.status(400).json({
-        error: "Project ID is required"
+        error: "Missing projectId or amount"
       });
     }
-
-    if (!amount || isNaN(amount)) {
-      return res.status(400).json({
-        error: "Valid amount is required"
-      });
-    }
-
-    /* ===============================
-       Project validation
-    =============================== */
 
     const project = projects[projectId];
 
     if (!project) {
       return res.status(400).json({
-        error: "Invalid project ID"
+        error: "Invalid project"
       });
     }
 
-    /* ===============================
-       Amount validation
-    =============================== */
-
-    if (!project.allowedAmounts.includes(Number(amount))) {
+    if (!project.allowedAmounts.includes(amount)) {
       return res.status(400).json({
-        error: "Amount not allowed for this project"
+        error: "Invalid amount"
       });
     }
 
-    /* ===============================
-       Create Stripe Checkout Session
-    =============================== */
-
+    // IMPORTANT: use dynamic URLs from frontend
     const session = await stripe.checkout.sessions.create({
 
       payment_method_types: ["card"],
 
-      line_items: [
-        {
-          price_data: {
-
-            currency: project.currency || "inr",
-
-            product_data: {
-              name: project.name
-            },
-
-            unit_amount: Number(amount) * 100
+      line_items: [{
+        price_data: {
+          currency: project.currency,
+          product_data: {
+            name: project.name
           },
-
-          quantity: 1
-        }
-      ],
+          unit_amount: amount * 100
+        },
+        quantity: 1
+      }],
 
       mode: "payment",
 
-      success_url:
-        successUrl ||
-        project.successUrl ||
-        "http://localhost:5500/success.html",
+      success_url: successUrl,
 
-      cancel_url:
-        cancelUrl ||
-        project.cancelUrl ||
-        "http://localhost:5500/cancel.html"
+      cancel_url: cancelUrl
 
     });
-
-
-    /* ===============================
-       Send session ID to frontend
-    =============================== */
 
     res.json({
       sessionId: session.id
@@ -110,15 +63,14 @@ router.post("/", async (req, res) => {
   }
   catch (error) {
 
-    console.error("Stripe Session Error:", error.message);
+    console.error(error);
 
     res.status(500).json({
-      error: "Unable to create checkout session"
+      error: "Payment failed"
     });
 
   }
 
 });
-
 
 module.exports = router;

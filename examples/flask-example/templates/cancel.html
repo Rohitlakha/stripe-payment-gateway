@@ -44,7 +44,13 @@
 
     .message {
       color: #666;
-      margin-bottom: 25px;
+      margin-bottom: 10px;
+    }
+
+    .redirect-message {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 20px;
     }
 
     .button {
@@ -79,8 +85,12 @@
       You can safely try again.
     </div>
 
+    <div class="redirect-message">
+      Redirecting to home page in 3 seconds...
+    </div>
+
     <button class="button" onclick="goHome()">
-      Try Again
+      Try Again Now
     </button>
 
   </div>
@@ -89,10 +99,16 @@
 
     function goHome() {
 
-      // Flask route redirect
       window.location.href = "/";
 
     }
+
+    // Auto redirect after 3 seconds
+    setTimeout(function() {
+
+      window.location.href = "/";
+
+    }, 3000);
 
   </script>
 

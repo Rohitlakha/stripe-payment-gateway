@@ -120,29 +120,31 @@
 
       try {
 
-        // Check SDK
         if (!window.StripeGateway) {
+
           status.innerText = "Payment system not loaded. Refresh page.";
           return;
+
         }
 
         button.disabled = true;
 
-        status.innerText = "Connecting to secure payment...";
+        status.innerText = "Redirecting to secure payment...";
 
         await StripeGateway.startPayment({
 
-          projectId: "flask_course",
+  projectId: "flask_course",
 
-          amount: 500,
+  amount: 500,
 
-          backendUrl: "http://localhost:4242",
+  backendUrl: "http://localhost:4242",
 
-          successUrl: window.location.origin + "/success",
+  successUrl: window.location.origin + "/set-success?session_id={CHECKOUT_SESSION_ID}",
 
-          cancelUrl: window.location.origin + "/cancel"
+  cancelUrl: window.location.origin + "/set-cancel?session_id={CHECKOUT_SESSION_ID}"
 
-        });
+});
+
 
       }
       catch (error) {

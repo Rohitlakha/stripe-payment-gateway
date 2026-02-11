@@ -1,83 +1,84 @@
-from flask import Flask, render_template, jsonify
-import os
-
-# ==========================================
-# Flask App Configuration
-# ==========================================
+from flask import Flask, render_template, redirect, session, url_for
 
 app = Flask(
     __name__,
-    template_folder="templates",
-    static_folder="static"
+    template_folder="templates"
 )
 
-# Disable caching during development
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+# REQUIRED for session security
+app.secret_key = "stripe_secure_secret_key"
 
 
 # ==========================================
-# Routes
+# HOME PAGE
 # ==========================================
-
-# Home page
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# Payment success page
+# ==========================================
+# SECURE SUCCESS ENTRY (Stripe redirect)
+# ==========================================
+@app.route("/set-success")
+def set_success():
+
+    session["payment_status"] = "success"
+
+    return redirect(url_for("success"))
+
+
+# ==========================================
+# SECURE CANCEL ENTRY (Stripe redirect)
+# ==========================================
+@app.route("/set-cancel")
+def set_cancel():
+
+    session["payment_status"] = "cancel"
+
+    return redirect(url_for("cancel"))
+
+
+# ==========================================
+# SUCCESS PAGE (protected)
+# ==========================================
 @app.route("/success")
 def success():
+
+    if session.get("payment_status") != "success":
+        return redirect(url_for("home"))
+
+    session.pop("payment_status", None)
+
     return render_template("success.html")
 
 
-# Payment cancel page
+# ==========================================
+# CANCEL PAGE (protected)
+# ==========================================
 @app.route("/cancel")
 def cancel():
+
+    if session.get("payment_status") != "cancel":
+        return redirect(url_for("home"))
+
+    session.pop("payment_status", None)
+
     return render_template("cancel.html")
 
 
-# Health check route (for testing / deployment)
-@app.route("/health")
-def health():
-    return jsonify({
-        "status": "ok",
-        "service": "Flask Frontend",
-        "payment_gateway": "connected"
-    })
-
-
 # ==========================================
-# Error Handling
+# RUN SERVER
 # ==========================================
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template("index.html"), 404
-
-
-@app.errorhandler(500)
-def server_error(e):
-    return {
-        "error": "Internal Server Error"
-    }, 500
-
-
-# ==========================================
-# Main Entry Point
-# ==========================================
-
 if __name__ == "__main__":
 
-    PORT = int(os.environ.get("PORT", 5000))
-
-    print("\n===================================")
+    print("===================================")
     print("Flask Payment Frontend Running")
-    print(f"Open: http://localhost:{PORT}")
-    print("===================================\n")
+    print("Open: http://localhost:5000")
+    print("===================================")
 
     app.run(
         host="0.0.0.0",
-        port=PORT,
+        port=5000,
         debug=True
     )
