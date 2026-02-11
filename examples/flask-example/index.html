@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>Stripe Payment Test</title>
+
+  <!-- Load Stripe FIRST -->
+  <script src="https://js.stripe.com/v3/"></script>
+
+  <!-- Load SDK from backend server -->
+  <script src="http://localhost:4242/sdk/payment-sdk.js"></script>
+
+</head>
+
+<body>
+
+<h2>Stripe Payment Gateway Test</h2>
+
+<button onclick="payNow()">
+  Pay ₹500
+</button>
+
+<script>
+
+function payNow() {
+
+  StripeGateway.startPayment({
+
+    amount: 500,
+
+    productName: "Student Course Fee",
+
+    publishableKey: "pk_test_51SjE4FFG8Xappwmkw79RnLJs6A21dlxjS7kuO0IgCa1PlnxwQOz0djpldsDJbjI5wf7jmYiHHnmRPiQV1pko5IvQ00OJtcs8tc"
+
+  });
+
+}
+
+</script>
+
+</body>
+
+</html>
